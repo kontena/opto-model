@@ -20,6 +20,11 @@ Or install it yourself as:
 
     $ gem install opto-model
 
+## Why?
+
+Why not use [Virtus](https://github.com/solnic/virtus) or [dry-types](http://dry-rb.org/gems/dry-types/) or [ModelAttribute](https://github.com/yammer/model_attribute) or X?
+Why not indeed. While [Opto](https://github.com/kontena/opto/) based attributes bring some handy benefits, such as the resolvers, you will probably find the alternatives a lot more full featured and sophisticated.
+
 ## Usage
 
 See [Opto README](https://github.com/kontena/opto/blob/master/README.md) for attribute definition syntax reference.
