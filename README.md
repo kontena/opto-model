@@ -1,8 +1,8 @@
-# Opto::Model
+# Opto/Model
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/opto/model`. To experiment with that code, run `bin/console` for an interactive prompt.
+[![Build Status](https://travis-ci.org/kontena/opto-model.svg?branch=master)](https://travis-ci.org/kontena/opto-model)
 
-TODO: Delete this and the text above, and describe your gem
+Uses [Opto](https://github.com/kontena/opto/) as the engine to add validatable attributes and build nestable models from Ruby objects.
 
 ## Installation
 
@@ -22,15 +22,96 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+See [Opto README](https://github.com/kontena/opto/blob/master/README.md) for attribute definition syntax reference.
 
-## Development
+### Defining models
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```ruby
+require 'opto-model'
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+class Name
+  include Opto.model
+
+  attribute :first_name, :string
+  attribute :last_name, :string
+end
+
+class Person
+  include Opto.model
+
+  has_one :name, Name, required: true
+  has_many :friends, Person
+
+  attribute :age, :integer, min: 18
+end
+```
+
+### Interacting with models (yes please)
+
+#### Create an instance
+```ruby
+guy = Person.new
+gal = Person.new(age: 20, name: { first_name: 'Elaine' }, friends: [guy])
+```
+
+#### Validating
+
+```ruby
+guy.valid?
+=> false
+guy.errors
+=> { :name => { :presence => "Child missing: 'name'" }, :age => { :presence => "Required value missing" } }
+```
+
+#### Relations
+
+Using another model:
+
+```ruby
+guy.name
+=> nil
+guy.name = Name.new(first_name: 'Guybrush', last_name: 'Threepwood')
+guy.name.first_name
+=> "Guybrush"
+```
+
+Using `new`:
+
+```ruby
+guy.name.new(first_name: 'Guybrush', last_name: 'Threepwood')
+```
+
+Using a hash:
+
+```ruby
+guy.name = {first_name: 'Guybrush', last_name: 'Threepwood'}
+```
+
+Using nested attributes:
+
+```ruby
+guy = Person.new(age: 18, name: { first_name: "Guybrush", last_name: "Threepwood" }, friends: [ { last_name: 'LeChuck' } ])
+```
+
+Also validates and collects errors for children:
+
+```ruby
+guy.valid?
+=> false
+guy.errors
+=> { :friends => { 0 => { :first_name => { :presence => "Required value missing" } } } }
+```
+
+..unless told not to:
+
+```ruby
+guy.valid?(false)
+=> true
+guy.errors(false)
+=> {}
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/opto-model.
+Bug reports and pull requests are welcome on GitHub at https://github.com/kontena/opto-model.
 
