@@ -15,10 +15,20 @@ module Opto
           if attribute_definitions.find { |d| d[:name] == name }
             raise RuntimeError, "Duplicate attribute '#{name}'"
           end
+          if type.to_sym == :boolean
+            arguments.merge!(as: "boolean")
+          end
+
           attribute_definitions << arguments.merge(name: name, type: type)
 
           define_method "#{name}_handler" do
             collection[name].handler
+          end
+
+          if type.to_sym == :boolean
+            define_method "#{name}?" do
+              collection[name].value
+            end
           end
 
           define_method name do

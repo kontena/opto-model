@@ -7,6 +7,7 @@ describe Opto::Model do
 
   before(:each) do
     Object.send(:remove_const, :TestModel) if Object.constants.include?(:TestModel)
+    Object.send(:remove_const, :TestBooleanModel) if Object.constants.include?(:TestBooleanModel)
     Object.send(:remove_const, :FooFoo) if Object.constants.include?(:FooFoo)
   end
 
@@ -31,6 +32,15 @@ describe Opto::Model do
         attribute :foo, :string
       end
       TestModel
+    }
+
+    let(:test_boolean) {
+      class TestBooleanModel
+        include Opto::Model
+
+        attribute :foo, :boolean
+      end
+      TestBooleanModel
     }
 
     it 'creates an instance without params' do
@@ -84,6 +94,12 @@ describe Opto::Model do
       end
       expect(FooFoo.new(foo: 'bar').foo).to eq 'bar'
     end
+
+    it 'creates #method? for boolean' do
+      expect(test_boolean.new(foo: true).foo?).to be_truthy
+      expect(test_boolean.new(foo: false).foo?).to be_falsey
+    end
+
   end
 
 end
