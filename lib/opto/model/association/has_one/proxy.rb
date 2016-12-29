@@ -8,7 +8,8 @@ module Opto
           extend Forwardable
 
           def initialize(parent, target_class, as, target = nil, options = {})
-            @parent, @target_class, @as, @target, @options = parent, target_class, as, target, options
+            @parent, @target_class, @as, @target = parent, target_class, as, target
+            @options = { key_is: :name }.merge(options)
           end
 
           def association_errors
@@ -32,6 +33,10 @@ module Opto
           end
 
           def new(*args)
+            if args.first.kind_of?(Hash) && args.size == 1 && args.first[args.first.keys.first].kind_of?(Hash)
+              key = args.first.keys.first
+              args = [args.first[key].merge(options[:key_is] => key)]
+            end
             @target = target_class.new(*args)
           end
 

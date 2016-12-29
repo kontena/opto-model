@@ -13,6 +13,7 @@ describe Opto::Model do
           include Opto::Model
 
           attribute :foo, :string
+          attribute :name, :string, required: false
 
           has_one :friend, AssocTestModel, required: true
           has_many :friends, AssocTestModel, required: true
@@ -52,6 +53,14 @@ describe Opto::Model do
         instance = assoc_test_model.new(friend: { foo: 'bar' })
         expect(instance.friend).to be_kind_of(assoc_test_model)
         expect(instance.friend.foo).to eq 'bar'
+        expect(instance.friend.name).to be_nil
+      end
+
+      it 'can initialize named has_one children' do
+        instance = assoc_test_model.new(friend: { baz: { foo: 'bar' }})
+        expect(instance.friend).to be_kind_of(assoc_test_model)
+        expect(instance.friend.foo).to eq 'bar'
+        expect(instance.friend.name).to eq 'baz'
       end
 
       it 'can initialize has_many children' do
@@ -60,6 +69,16 @@ describe Opto::Model do
         expect(instance.friends.size).to eq 2
         expect(instance.friends.first.foo).to eq 'bar'
         expect(instance.friends.last.foo).to eq 'baz'
+      end
+
+      it 'can initialize named has_many children' do
+        instance = assoc_test_model.new(friends: { baz: {foo: 'bar' }, buz: {foo: 'baz'} })
+        expect(instance.friends.first).to be_kind_of(assoc_test_model)
+        expect(instance.friends.size).to eq 2
+        expect(instance.friends.first.foo).to eq 'bar'
+        expect(instance.friends.last.foo).to eq 'baz'
+        expect(instance.friends.first.name).to eq 'baz'
+        expect(instance.friends.last.name).to eq 'buz'
       end
 
       it 'can clear an association' do
