@@ -57,7 +57,7 @@ module Opto
             result.empty? ? {} : { as => result }
           end
 
-          def_delegators :members, *::Array.instance_methods - [:__send__, :object_id, :to_h]
+          def_delegators :members, *::Array.instance_methods - [:__send__, :object_id, :to_h, :__id__]
         end
       end
     end
