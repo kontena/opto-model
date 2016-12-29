@@ -36,7 +36,7 @@ module Opto
           def new(*args)
             if args.first.kind_of?(Hash) && args.size == 1 && args.first[args.first.keys.first].kind_of?(Hash)
               key = args.first.keys.first
-              args = [args.first[key].merge(options[:key_is] => key)]
+              args = [args.first[key].merge(options[:key_is] => key.kind_of?(Symbol) ? key.to_s : key)]
             end
             target = target_class.new(*args)
             members << target
