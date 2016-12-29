@@ -37,6 +37,16 @@ module Opto
                     end
                   end
                   self.send(relation).members
+                elsif args.kind_of?(Hash)
+                  self.send(relation).clear
+                  args.each do |k,v|
+                    if v.kind_of?(Hash)
+                      self.send(relation).new(k => v)
+                    else
+                      raise TypeError, "Expected an instance of Hash"
+                    end
+                  end
+                  self.send(relation).members
                 elsif args.nil?
                   self.send(relation).clear
                 else

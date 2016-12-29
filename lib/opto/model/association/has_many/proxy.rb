@@ -8,7 +8,8 @@ module Opto
           extend Forwardable
 
           def initialize(parent, target_class, as, options = {})
-            @parent, @target_class, @as, @options = parent, target_class, as, options
+            @parent, @target_class, @as = parent, target_class, as
+            @options = { key_is: :name }.merge(options)
             @members = []
           end
 
@@ -33,6 +34,10 @@ module Opto
           end
 
           def new(*args)
+            if args.first.kind_of?(Hash) && args.size == 1 && args.first[args.first.keys.first].kind_of?(Hash)
+              key = args.first.keys.first
+              args = [args.first[key].merge(options[:key_is] => key.kind_of?(Symbol) ? key.to_s : key)]
+            end
             target = target_class.new(*args)
             members << target
             target
@@ -52,7 +57,7 @@ module Opto
             result.empty? ? {} : { as => result }
           end
 
-          def_delegators :members, *::Array.instance_methods - [:__send__, :object_id, :to_h]
+          def_delegators :members, *::Array.instance_methods - [:__send__, :object_id, :to_h, :__id__]
         end
       end
     end
